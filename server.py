@@ -29,9 +29,35 @@ def sms():
 		msg = encode_message(msg_body, from_number)
 		return send_message(msg, PRIVATE_NUMBER)
 
+@app.route('/call', methods=['GET', 'POST'])
+def call():
+	from_number = request.form['From']
+
+	if from_number != PRIVATE_NUMBER:
+		return perform_call(PRIVATE_NUMBER)
+	else:
+		response = VoiceResponse()
+		g = Gather(action="/aliasing", finish_on_key="#", method="POST")
+		g.say("Hello organizer. Dial the number you want to call followed by the hash symbol.")
+		response.append(g)
+		return str(response)
+
 def send_message(msg, number):
 	response = MessagingResponse()
 	response.message(msg, to=number, from_=TWILIO_NUMBER)
+	return str(response)
+
+@app.route("/aliasing", methods=['GET', 'POST'])
+def aliasing():
+	number = request.values.get('Digits')
+
+	if number:
+		return perform_call(number, TWILIO_NUMBER)
+	return "Aliasing Failed."
+
+def perform_call(number, caller_id=None):
+	response = VoiceResponse
+	response.dial(number, caller_id=caller_id)
 	return str(response)
 
 if __name__ == '__main__':
