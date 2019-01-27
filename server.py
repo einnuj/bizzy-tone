@@ -56,7 +56,7 @@ def aliasing():
 	return "Aliasing Failed."
 
 def perform_call(number, caller_id=None):
-	response = VoiceResponse
+	response = VoiceResponse()
 	response.dial(number, caller_id=caller_id)
 	return str(response)
 
